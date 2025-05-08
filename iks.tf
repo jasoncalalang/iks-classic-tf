@@ -1,11 +1,3 @@
-###############################################################################
-# Terraform configuration to deploy a vanilla VPC ("vpc-test") in jp-tok with
-# – three /18 subnets, three public gateways, three **RHCOS workload VSIs**
-#   (bx2‑4x16) and one cx2‑2x4 bastion host with a floating IP.
-#   RHCOS nodes boot with an Ignition file that a) injects the SSH key for the
-#   core user and b) registers each host to your Satellite location.
-###############################################################################
-
 terraform {
   required_providers {
     ibm = {
@@ -49,13 +41,13 @@ variable "region" {
 variable "cluster_name" {
   description = "Name of the IKS cluster"
   type        = string
-  default     = "my-iks-classic-cluster"
+  default     = "test-iks-01"
 }
 
-variable "datacenter" {
-  description = "Classic infrastructure datacenter (zone)"
-  type        = string
-  default     = "tok02"
+variable "zones" {
+  description = "List of datacenters (zones)"
+  type        = list(string)
+  default     = ["tok02", "tok04"]
 }
 
 variable "machine_type" {
@@ -89,12 +81,11 @@ variable "default_pool_size" {
 variable "kube_version" {
   description = "Kubernetes version for the cluster"
   type        = string
-  default     = "1.21.9"
+  default     = "1.32.4"
 }
 
 resource "ibm_container_cluster" "classic_cluster" {
   name                    = var.cluster_name
-  datacenter              = var.datacenter
   machine_type            = var.machine_type
   hardware                = var.hardware
   public_vlan_id          = var.public_vlan_id
@@ -103,5 +94,6 @@ resource "ibm_container_cluster" "classic_cluster" {
   kube_version            = var.kube_version
   public_service_endpoint = true
   private_service_endpoint = true
+  datacenter              = var.zones[0]
 }
 
