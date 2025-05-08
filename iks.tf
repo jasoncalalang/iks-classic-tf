@@ -95,5 +95,19 @@ resource "ibm_container_cluster" "classic_cluster" {
   public_service_endpoint = true
   private_service_endpoint = true
   datacenter              = var.zones[0]
+  tags                   = ["prod"]
 }
 
+resource "ibm_container_cluster" "iks_nonprod" {
+  name                    = "test-nonprod-classic"
+  machine_type            = "m3c.8x64"
+  hardware                = var.hardware
+  public_vlan_id          = var.public_vlan_id
+  private_vlan_id         = var.private_vlan_id
+  default_pool_size       = 1
+  kube_version            = var.kube_version
+  public_service_endpoint = true
+  private_service_endpoint = true
+  datacenter              = var.zones[0]
+  tags                    = ["nonprod", "test"]
+}
