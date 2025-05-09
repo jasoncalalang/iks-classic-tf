@@ -1,0 +1,84 @@
+###############################################################################
+# 1. Service – internal ClusterIP (default)
+###############################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: phpmyadmin
+  namespace: databases
+  labels:
+    app: phpmyadmin
+spec:
+  selector:
+    app: phpmyadmin
+  ports:
+    - name: http            
+      port: 80
+      targetPort: 80
+---
+###############################################################################
+# 2. Deployment – single-pod console for non-prod use
+###############################################################################
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phpmyadmin
+  namespace: databases
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: phpmyadmin
+  template:
+    metadata:
+      labels:
+        app: phpmyadmin
+    spec:
+      containers:
+        - name: phpmyadmin
+          image: phpmyadmin:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: PMA_HOST
+              value: mysql-primary.databases.svc.cluster.local
+            - name: PMA_PORT
+              value: "3306"
+            - name: PMA_USER
+              value: root
+            - name: PMA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-root-pass
+                  key: MYSQL_ROOT_PASSWORD
+---
+###############################################################################
+# 3. Ingress – public ALB (TLS + automatic HTTP→HTTPS redirect)
+###############################################################################
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: phpmyadmin
+  namespace: databases
+  labels:                     
+    app: phpmyadmin
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"   
+    nginx.ingress.kubernetes.io/proxy-body-size: "8m"
+spec:
+  ingressClassName: public-iks-k8s-nginx   
+  rules:
+    - host: mysql-console.test-nonprod-classic-2d3fb824a69ea5c326974e87bbe5c52a-0000.jp-tok.containers.appdomain.cloud 
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: phpmyadmin
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - mysql-console.test-nonprod-classic-2d3fb824a69ea5c326974e87bbe5c52a-0000.jp-tok.containers.appdomain.cloud
+      secretName: test-nonprod-classic-2d3fb824a69ea5c326974e87bbe5c52a-0000
