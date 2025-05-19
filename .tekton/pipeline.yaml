@@ -1,0 +1,50 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: hello-world-build-deploy
+spec:
+  workspaces:
+  - name: source                        # Git repo auto-cloned by the worker
+  params:
+  - name: IMAGE_NAME                    # e.g. jp.icr.io/demo/hello-node
+    type: string
+  - name: REGISTRY_NAMESPACE            # e.g. demo
+    type: string
+  - name: CLUSTER_NAME                  # IKS cluster name or ID
+    type: string
+
+  tasks:
+  # 1️⃣ Build & push with BuildKit
+  - name: build-and-push
+    taskRef:
+      name: icr-containerize            # from Tekton catalog
+      kind: ClusterTask
+    params:
+    - name: image
+      value: $(params.IMAGE_NAME)
+    - name: registryNamespace
+      value: $(params.REGISTRY_NAMESPACE)
+    - name: dockerfile
+      value: Dockerfile
+    - name: contextDir
+      value: .
+    workspaces:
+    - name: workspace
+      workspace: source
+
+  # 2️⃣ Deploy to IKS with kubectl
+  - name: deploy-to-iks
+    taskRef:
+      name: iks-deploy-to-kubernetes
+      kind: ClusterTask
+    runAfter: [build-and-push]
+    params:
+    - name: cluster
+      value: $(params.CLUSTER_NAME)
+    - name: manifestFiles
+      value: k8s/deployment.yaml
+    - name: image
+      value: $(params.IMAGE_NAME)
+    workspaces:
+    - name: workspace
+      workspace: source
