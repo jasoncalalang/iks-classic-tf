@@ -16,8 +16,8 @@ resource "ibm_resource_instance" "icr_nonprod" {
   tags              = ["nonprod", "icr", "terraform"]
 }
 
-resource "ibm_container_registry_namespace" "icr_namespace" {
-  name                  = var.icr_instance_name
-  location              = var.region
-  resource_instance_id = ibm_resource_instance.icr_nonprod.id
+resource "ibm_cr_namespace" "icr_namespace" {
+  name               = var.icr_instance_name 
+  resource_group_id  = data.ibm_resource_group.target.id
+  tags               = ["nonprod", "icr", "terraform"]
 }
