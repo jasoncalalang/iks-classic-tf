@@ -127,6 +127,6 @@ resource "ibm_container_cluster" "iks_nonprod" {
   public_service_endpoint  = true
   private_service_endpoint = true
   datacenter               = var.zones[0]
-  subnet_id                = [ subnet_id_1 ]
+  subnet_id                = [ var.subnet_id_1, var.subnet_id_2 ]
   tags                     = ["nonprod", "test"]
 }
