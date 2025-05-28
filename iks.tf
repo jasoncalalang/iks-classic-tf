@@ -101,21 +101,6 @@ variable "subnet_id_3" {
   type        = string
   default     = "772348"
 }
-
-# resource "ibm_container_cluster" "iks_prod" {
-#   name                    = var.cluster_name
-#   machine_type            = var.machine_type
-#   hardware                = var.hardware
-#   public_vlan_id          = var.public_vlan_id
-#   private_vlan_id         = var.private_vlan_id
-#   default_pool_size       = var.default_pool_size
-#   kube_version            = var.kube_version
-#   public_service_endpoint = true
-#   private_service_endpoint = true
-#   datacenter              = var.zones[0]
-#   tags                   = ["prod"]
-# }
-
 resource "ibm_container_cluster" "iks_nonprod" {
   name                     = var.cluster_name
   machine_type             = var.machine_type
