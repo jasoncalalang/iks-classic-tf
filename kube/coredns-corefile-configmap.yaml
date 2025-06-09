@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns
+  namespace: kube-system
+data:
+  Corefile: |
+    .:53 {
+      log
+      errors
+      cache 30
+
+      acl {
+        allow 130.198.75.32/28
+        allow 168.1.115.160/27
+        allow 168.1.68.0/27
+        allow 168.1.139.160/27
+        allow 168.1.80.224/27
+        allow 10.63.89.128/26
+        allow 10.63.14.176/28
+        allow 10.63.14.144/28
+        allow 10.63.14.160/28
+        allow 10.63.94.192/28
+        allow 10.63.93.0/26
+        allow 10.63.83.128/28
+        allow 10.63.89.48/28
+        allow 10.63.89.16/28
+        allow 10.63.83.160/28
+        allow 10.63.83.144/28
+        allow 10.63.14.128/28
+        allow 10.63.89.32/28
+        allow 10.63.83.176/28
+        allow 10.63.97.192/26
+        allow 10.63.98.0/26
+        allow 10.63.97.128/28
+        allow 10.63.94.224/28
+        allow 10.63.94.240/28
+        allow 10.63.84.32/27
+        allow 10.0.0.0/14
+        block
+      }
+
+      hosts {
+        # BOQ Production
+        10.63.94.232  EslPdf.production.boq.esignibm.local
+        10.63.94.228  EslWeb.production.boq.esignibm.local    esl.api
+        10.63.94.233  EslApp.production.boq.esignibm.local    esl.backoffice
+        10.63.94.230  NuvWaf.production.boq.esignibm.local    myself    wafr
+        10.63.97.132  NuvWeb.production.boq.esignibm.local
+        10.63.94.229  IxCusPort.production.boq.esignibm.local
+
+        # BOQ Non-Production
+        10.63.89.50   EslApp.non-production.boq.esignibm.local
+        10.63.89.51   EslPdf.non-production.boq.esignibm.local
+        10.63.89.52   EslWeb.non-production.boq.esignibm.local
+        10.63.89.54   NuvWaf.non-production.boq.esignibm.local   boq-non-production-nuvwaf.esignibm.local
+        10.63.14.146  nuvweb.non-production.boq.esignibm.local   boq-non-production-nuvweb.esignibm.local
+        10.63.89.53   IxCusPort.non-production.boq.esignibm.local
+
+        fallthrough
+      }
+
+      forward . 10.0.80.11
+    }
