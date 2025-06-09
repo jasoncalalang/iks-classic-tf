@@ -5,7 +5,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: phpmyadmin
-  namespace: databases
   labels:
     app: phpmyadmin
 spec:
@@ -23,7 +22,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: phpmyadmin
-  namespace: databases
 spec:
   replicas: 1
   selector:
@@ -41,7 +39,7 @@ spec:
             - containerPort: 80
           env:
             - name: PMA_HOST
-              value: mysql-primary.databases.svc.cluster.local
+              value: mysql-primary.dev.svc.cluster.local
             - name: PMA_PORT
               value: "3306"
             - name: PMA_USER
@@ -59,7 +57,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: phpmyadmin
-  namespace: databases
   labels:                     
     app: phpmyadmin
   annotations:
@@ -68,7 +65,7 @@ metadata:
 spec:
   ingressClassName: public-iks-k8s-nginx   
   rules:
-    - host: mysql-console.test-nonprod-classic-2d3fb824a69ea5c326974e87bbe5c52a-0000.jp-tok.containers.appdomain.cloud 
+    - host: mysql-console.da-iks-nonprod-159e348f9c20ad952bce3973248a2c8c-0000.au-syd.containers.appdomain.cloud
       http:
         paths:
           - path: /
@@ -80,5 +77,5 @@ spec:
                   number: 80
   tls:
     - hosts:
-        - mysql-console.test-nonprod-classic-2d3fb824a69ea5c326974e87bbe5c52a-0000.jp-tok.containers.appdomain.cloud
-      secretName: test-nonprod-classic-2d3fb824a69ea5c326974e87bbe5c52a-0000
+        - mysql-console.da-iks-nonprod-159e348f9c20ad952bce3973248a2c8c-0000.au-syd.containers.appdomain.cloud
+      secretName: da-iks-nonprod-159e348f9c20ad952bce3973248a2c8c-0000

@@ -2,18 +2,10 @@
 # mysql-nonprod.yaml – MySQL 8.4 for non-production (dev/test)
 # IBM Cloud Kubernetes Service – Classic Infra, Gold Block Storage
 ###############################################################################
-
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: databases
----
-
 apiVersion: v1
 kind: Secret
 metadata:
   name: mysql-root-pass
-  namespace: databases
 type: Opaque
 stringData:
   MYSQL_ROOT_PASSWORD: "DevTest1234!"  
@@ -23,7 +15,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mysql
-  namespace: databases
   labels:
     app: mysql
 spec:
@@ -40,7 +31,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mysql-primary
-  namespace: databases
   labels:
     app: mysql
 spec:
@@ -57,7 +47,6 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: mysql-pdb
-  namespace: databases
 spec:
   minAvailable: 1
   selector:
@@ -69,7 +58,6 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: mysql
-  namespace: databases
 spec:
   serviceName: mysql
   replicas: 1
