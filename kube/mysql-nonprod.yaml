@@ -118,4 +118,4 @@ spec:
         storageClassName: ibmc-block-gold
         resources:
           requests:
-            storage: 20Gi
+            storage: 80Gi
